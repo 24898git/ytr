@@ -1,0 +1,125 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="text-primary">
+        <i class="fas fa-users me-2"></i>Patient Records
+    </h1>
+    <div>
+        <a href="{{ url_for('add_patient') }}" class="btn btn-success">
+            <i class="fas fa-plus me-1"></i>Add New Patient
+        </a>
+    </div>
+</div>
+
+<!-- Summary Cards -->
+<div class="row mb-4">
+    <div class="col-md-3">
+        <div class="card bg-primary text-white">
+            <div class="card-body">
+                <div class="d-flex justify-content-between">
+                    <div>
+                        <h3 class="card-title">{{ total_patients }}</h3>
+                        <p class="card-text mb-0">Total Patients</p>
+                    </div>
+                    <div class="align-self-center">
+                        <i class="fas fa-users fa-2x"></i>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Patients Table -->
+{% if patients %}
+<div class="card">
+    <div class="card-header bg-light">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-list me-2"></i>All Patients
+        </h5>
+    </div>
+    <div class="card-body p-0">
+        <div class="table-responsive">
+            <table class="table table-hover table-striped mb-0">
+                <thead class="table-dark">
+                    <tr>
+                        <th>Patient ID</th>
+                        <th>Name</th>
+                        <th>Age</th>
+                        <th>Gender</th>
+                        <th>Contact</th>
+                        <th>Last Visit</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for patient in patients %}
+                    <tr>
+                        <td>
+                            <span class="badge bg-primary">{{ patient['patient_id'] }}</span>
+                        </td>
+                        <td>
+                            <strong>{{ patient['name'] }}</strong>
+                            {% if patient['email'] %}
+                            <br><small class="text-muted">{{ patient['email'] }}</small>
+                            {% endif %}
+                        </td>
+                        <td>{{ patient['age'] }}</td>
+                        <td>
+                            <span class="badge bg-{{ 'info' if patient['gender'] == 'Male' else 'warning' }}">
+                                {{ patient['gender'] }}
+                            </span>
+                        </td>
+                        <td>
+                            {% if patient['contact'] %}
+                            <i class="fas fa-phone me-1 text-muted"></i>{{ patient['contact'] }}
+                            {% else %}
+                            <span class="text-muted">N/A</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            {% if patient['last_visit'] %}
+                            {{ patient['last_visit'] }}
+                            {% else %}
+                            <span class="text-muted">Not visited</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group btn-group-sm">
+                                <a href="{{ url_for('view_history', patient_id=patient['patient_id']) }}" 
+                                   class="btn btn-info" title="View History">
+                                    <i class="fas fa-eye"></i>
+                                </a>
+                                <a href="{{ url_for('edit_patient', patient_id=patient['patient_id']) }}" 
+                                   class="btn btn-warning" title="Edit">
+                                    <i class="fas fa-edit"></i>
+                                </a>
+                                <a href="{{ url_for('delete_patient', patient_id=patient['patient_id']) }}" 
+                                   class="btn btn-danger" title="Delete"
+                                   onclick="return confirm('Are you sure you want to delete patient {{ patient['patient_id'] }}?')">
+
+                                    <i class="fas fa-trash"></i>
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="text-center py-5">
+    <div class="empty-state">
+        <i class="fas fa-users fa-4x text-muted mb-3"></i>
+        <h3>No Patients Found</h3>
+        <p class="text-muted mb-4">Get started by adding your first patient record.</p>
+        <a href="{{ url_for('add_patient') }}" class="btn btn-primary btn-lg">
+            <i class="fas fa-plus me-2"></i>Add First Patient
+        </a>
+    </div>
+</div>
+{% endif %}
+{% endblock %}

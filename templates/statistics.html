@@ -1,0 +1,147 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="text-primary">
+        <i class="fas fa-chart-bar me-2"></i>System Statistics
+    </h1>
+    <a href="{{ url_for('index') }}" class="btn btn-outline-secondary">
+        <i class="fas fa-arrow-left me-1"></i>Back to List
+    </a>
+</div>
+
+<!-- Statistics Cards -->
+<div class="row mb-4">
+    <div class="col-md-4">
+        <div class="card bg-primary text-white">
+            <div class="card-body text-center">
+                <h2 class="card-title">{{ total_patients }}</h2>
+                <p class="card-text">Total Patients</p>
+                <i class="fas fa-users fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-success text-white">
+            <div class="card-body text-center">
+                <h2 class="card-title">{{ recent_registrations }}</h2>
+                <p class="card-text">Recent (30 days)</p>
+                <i class="fas fa-user-plus fa-2x"></i>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card bg-info text-white">
+            <div class="card-body text-center">
+                <h2 class="card-title">{{ total_patients - recent_registrations }}</h2>
+                <p class="card-text">Older Records</p>
+                <i class="fas fa-history fa-2x"></i>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Gender Distribution -->
+<div class="row">
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-venus-mars me-2"></i>Gender Distribution
+                </h5>
+            </div>
+            <div class="card-body">
+                {% if gender_stats %}
+                <div class="table-responsive">
+                    <table class="table table-striped">
+                        <thead>
+                            <tr>
+                                <th>Gender</th>
+                                <th>Count</th>
+                                <th>Percentage</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for stat in gender_stats %}
+                            <tr>
+                                <td>
+                                    <span class="badge bg-{{ 'info' if stat[0] == 'Male' else 'warning' }}">
+                                        {{ stat[0] }}
+                                    </span>
+                                </td>
+                                <td>{{ stat[1] }}</td>
+                                <td>
+                                    {{ "%.1f"|format((stat[1] / total_patients * 100) if total_patients > 0 else 0) }}%
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+                {% else %}
+                <p class="text-muted">No gender data available.</p>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+    
+    <div class="col-md-6">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-rocket me-2"></i>Quick Actions
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="d-grid gap-2">
+                    <a href="{{ url_for('add_patient') }}" class="btn btn-success">
+                        <i class="fas fa-plus me-2"></i>Add New Patient
+                    </a>
+                    <a href="{{ url_for('search_patients') }}" class="btn btn-primary">
+                        <i class="fas fa-search me-2"></i>Search Patients
+                    </a>
+                    <a href="{{ url_for('print_list') }}" class="btn btn-info">
+                        <i class="fas fa-print me-2"></i>Print Patient List
+                    </a>
+                    <a href="{{ url_for('export_csv') }}" class="btn btn-warning">
+                        <i class="fas fa-file-csv me-2"></i>Export to CSV
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- System Information -->
+<div class="row mt-4">
+    <div class="col-12">
+        <div class="card">
+            <div class="card-header bg-light">
+                <h5 class="card-title mb-0">
+                    <i class="fas fa-info-circle me-2"></i>System Information
+                </h5>
+            </div>
+            <div class="card-body">
+                <div class="row">
+                    <div class="col-md-6">
+                        <table class="table table-bordered">
+                            <tr>
+                                <th class="bg-light">Database File:</th>
+                                <td>patients.db</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Total Records:</th>
+                                <td>{{ total_patients }}</td>
+                            </tr>
+                            <tr>
+                                <th class="bg-light">Current Date:</th>
+                                <td>{{ now.strftime('%Y-%m-%d %H:%M:%S') if now else 'N/A' }}</td>
+                            </tr>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

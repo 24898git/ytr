@@ -1,0 +1,111 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h1 class="text-primary">
+        <i class="fas fa-print me-2"></i>Print Patient List
+    </h1>
+    <div>
+        <a href="{{ url_for('export_csv') }}" class="btn btn-success me-2">
+            <i class="fas fa-file-csv me-1"></i>Export to CSV
+        </a>
+        <button onclick="window.print()" class="btn btn-primary">
+            <i class="fas fa-print me-1"></i>Print List
+        </button>
+    </div>
+</div>
+
+{% if patients %}
+<div class="card printable-area">
+    <div class="card-header bg-light d-print-none">
+        <h5 class="card-title mb-0">
+            <i class="fas fa-print me-2"></i>Patient List - Ready for Printing
+        </h5>
+    </div>
+    <div class="card-body">
+        <!-- Print Header -->
+        <div class="print-header text-center mb-4 d-none d-print-block">
+            <h2>Patient List Report</h2>
+            <p class="lead">Generated on: {{ current_date }}</p>
+            <hr>
+        </div>
+        
+        <table class="table table-bordered">
+            <thead class="table-dark">
+                <tr>
+                    <th>Patient ID</th>
+                    <th>Name</th>
+                    <th>Age</th>
+                    <th>Gender</th>
+                    <th>Contact</th>
+                    <th>Email</th>
+                    <th>Last Visit</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for patient in patients %}
+                <tr>
+                    <td><strong>{{ patient['patient_id'] }}</strong></td>
+                    <td>{{ patient['name'] }}</td>
+                    <td>{{ patient['age'] }}</td>
+                    <td>{{ patient['gender'] }}</td>
+                    <td>{{ patient['contact'] or 'N/A' }}</td>
+                    <td>{{ patient['email'] or 'N/A' }}</td>
+                    <td>{{ patient['last_visit'] or 'N/A' }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        
+        <div class="row mt-4">
+            <div class="col-md-6">
+                <div class="alert alert-info">
+                    <strong>Total Patients:</strong> {{ patients|length }}
+                </div>
+            </div>
+            <div class="col-md-6 text-end d-print-none">
+                <div class="alert alert-warning">
+                    <small>
+                        <i class="fas fa-info-circle me-1"></i>
+                        Click "Print List" button or use Ctrl+P to print this report
+                    </small>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-info">
+    <i class="fas fa-info-circle me-2"></i>
+    No patients found to print. 
+    <a href="{{ url_for('add_patient') }}" class="alert-link">Add some patients first</a>.
+</div>
+{% endif %}
+
+<style>
+@media print {
+    .navbar, .btn, .d-print-none, .card-header, .alert {
+        display: none !important;
+    }
+    .printable-area {
+        border: none !important;
+        box-shadow: none !important;
+    }
+    .print-header {
+        display: block !important;
+    }
+    body {
+        font-size: 12px;
+    }
+    table {
+        font-size: 11px;
+    }
+}
+
+.print-header {
+    border-bottom: 2px solid #333;
+    margin-bottom: 20px;
+    padding-bottom: 10px;
+}
+</style>
+{% endblock %}

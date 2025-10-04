@@ -1,0 +1,110 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="row">
+    <div class="col-lg-8 mx-auto">
+        <div class="card">
+            <div class="card-header bg-primary text-white">
+                <h4 class="card-title mb-0">
+                    <i class="fas fa-search me-2"></i>Search Patients
+                </h4>
+            </div>
+            <div class="card-body">
+                <form method="POST" class="mb-4">
+                    <div class="input-group">
+                        <input type="text" class="form-control form-control-lg" 
+                               name="search_query" 
+                               value="{{ search_query }}"
+                               placeholder="Search by patient name, ID, or contact...">
+                        <button type="submit" class="btn btn-primary btn-lg">
+                            <i class="fas fa-search me-1"></i>Search
+                        </button>
+                    </div>
+                    <small class="form-text text-muted mt-2">
+                        Enter patient name, patient ID, or contact number to search.
+                    </small>
+                </form>
+
+                {% if patients %}
+                <div class="search-results">
+                    <h5 class="mb-3 text-success">
+                        <i class="fas fa-users me-2"></i>
+                        Search Results ({{ patients|length }} found)
+                    </h5>
+                    
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead class="table-light">
+                                <tr>
+                                    <th>Patient ID</th>
+                                    <th>Name</th>
+                                    <th>Age</th>
+                                    <th>Gender</th>
+                                    <th>Contact</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for patient in patients %}
+                                <tr>
+                                    <td>
+                                        <span class="badge bg-primary">{{ patient['patient_id'] }}</span>
+                                    </td>
+                                    <td>
+                                        <strong>{{ patient['name'] }}</strong>
+                                        {% if patient['email'] %}
+                                        <br><small class="text-muted">{{ patient['email'] }}</small>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ patient['age'] }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'info' if patient['gender'] == 'Male' else 'warning' }}">
+                                            {{ patient['gender'] }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        {% if patient['contact'] %}
+                                        <i class="fas fa-phone me-1 text-muted"></i>{{ patient['contact'] }}
+                                        {% else %}
+                                        <span class="text-muted">N/A</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm">
+                                            <a href="{{ url_for('view_history', patient_id=patient['patient_id']) }}" 
+                                               class="btn btn-info" title="View History">
+                                                <i class="fas fa-eye"></i>
+                                            </a>
+                                            <a href="{{ url_for('edit_patient', patient_id=patient['patient_id']) }}" 
+                                               class="btn btn-warning" title="Edit">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                {% elif request.method == 'POST' and search_query %}
+                <div class="text-center py-4">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4>No patients found</h4>
+                    <p class="text-muted">No patients match your search criteria "{{ search_query }}"</p>
+                    <a href="{{ url_for('add_patient') }}" class="btn btn-primary">
+                        <i class="fas fa-plus me-1"></i>Add New Patient
+                    </a>
+                </div>
+                {% elif request.method == 'GET' %}
+                <div class="text-center py-4">
+                    <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                    <h4>Search Patients</h4>
+                    <p class="text-muted">Use the search box above to find patients by name, patient ID, or contact number.</p>
+                </div>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
